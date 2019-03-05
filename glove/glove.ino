@@ -7,8 +7,8 @@ const int FLEX_PIN5 = A4; // Pin connected to voltage divider output
 
 // Measure the voltage at 5V and the actual resistance of your
 // 47k resistor, and enter them below:
-const int VCC = 4.98; // Measured voltage of Ardunio 5V line
-const int R_DIV = 47500.0; // Measured resistance of 3.3k resistor
+const float VCC = 4.98; // Measured voltage of Ardunio 5V line
+const float R_DIV = 47500.0; // Measured resistance of 3.3k resistor
 
 // Upload the code, then try to adjust these values to more
 // accurately calculate bend degree.
@@ -282,7 +282,7 @@ int readFinger(const int FLEX_PIN, int fingerNumber){
                    0, 90.0);
   //Serial.print(" Bend: " + String(angle1) + " degrees");
     //Serial.println();
-  Serial.print(String(angle1) + ", ");
-  Serial.println(String (((int) angle1)));
+  Serial.print("{" + String(angle1) + ", ");
+  Serial.println(String(((int) angle1)) + "}");
 return (int) angle1;
 }
