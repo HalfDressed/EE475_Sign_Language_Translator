@@ -123,7 +123,7 @@ void loop()
   
   Serial.println();
   delay(500);
-  String letter = "no letter found";
+  String message = "not found";
   for(int i = 0; i < 26; i++){
     int currDiff = 0;
     int lastDiff = 1;
@@ -146,10 +146,10 @@ void loop()
                         if(currDiff < lastDiff){
                           currLetter = i + 65;
                           lastDiff = currDiff;
-                          Serial.println("changed letter");
+                          Serial.println("\t changed letter");
                         }
-                         letter = "letter = ";
-                         Serial.print(letter);
+                         message = "letter = ";
+                         Serial.print(message);
                          Serial.println(currLetter);
                           
                   }
@@ -187,15 +187,16 @@ void performCalibration() {
       Serial.print("...");
       delay(1000); // 1000ms = 1 second delay. 
     }
-    Serial.print("0... SAMPLING...");
+    Serial.println("0... SAMPLING...");
     
     int finger_samples [FINGERS][SAMPLES];
     int finger_error_delta [FINGERS];
+    
     for (int j = 0; j < SAMPLES; j++) {
       for (int k = 0; k < FINGERS; k++) {
         finger_samples[k][j] = readFingerByIndex(k);
       }
-      Serial.print(" sample taken...");
+      Serial.println("\t Sample Taken");
       delay (500); // 500ms delay
     }
     Serial.println(" DONE");
@@ -270,7 +271,7 @@ int readFingerByIndex (int finger) {
 }
 
 int readFinger(const int FLEX_PIN, int fingerNumber){
-  Serial.print("Value read from: " + String(fingerNumber));
+  //Serial.print("Value read from: " + String(fingerNumber));
   float flexADC1 = analogRead(FLEX_PIN);
   float flexV1 = flexADC1 * VCC / 1023.0;
   float flexR1 = R_DIV * (VCC / flexV1 - 1.0);
@@ -280,9 +281,7 @@ int readFinger(const int FLEX_PIN, int fingerNumber){
   // bend angle:
   float angle1 = map(flexR1, STRAIGHT_RESISTANCE[fingerNumber - 1], BEND_RESISTANCE[fingerNumber - 1],
                    0, 90.0);
-  //Serial.print(" Bend: " + String(angle1) + " degrees");
-    //Serial.println();
-  Serial.print("{" + String(angle1) + ", ");
-  Serial.println(String(((int) angle1)) + "}");
+  //Serial.print("{" + String(angle1) + ", ");
+  //Serial.println(String(((int) angle1)) + "}");
 return (int) angle1;
 }
