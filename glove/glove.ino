@@ -12,8 +12,8 @@ const float R_DIV = 47500.0; // Measured resistance of 3.3k resistor
 
 // Upload the code, then try to adjust these values to more
 // accurately calculate bend degree.
-const int STRAIGHT_RESISTANCE [5] = {53523.38, 48154.52, 53945.73, 47407.23, 53314.31}; // Resistance when straight
-const int BEND_RESISTANCE [5] = {99305.13, 139394.22, 123000.0, 126666.67, 136562.5}; // Resistance at 90 deg
+const float STRAIGHT_RESISTANCE [5] = {53523.38, 48154.52, 53945.73, 47407.23, 53314.31}; // Resistance when straight
+const float BEND_RESISTANCE [5] = {99305.13, 139394.22, 123000.0, 126666.67, 136562.5}; // Resistance at 90 deg
 
 // Contains all 5 sensor value (each finger) for every letter of the alphabet
 int letterMatrix[26][5] = { 
