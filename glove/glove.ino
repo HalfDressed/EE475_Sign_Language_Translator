@@ -113,7 +113,7 @@ void loop()
   int angle3 = readFinger(FLEX_PIN3,3);
   int angle4 = readFinger(FLEX_PIN4,4);
   int angle5 = readFinger(FLEX_PIN5,5);
-  Serial.println("{" + angle1 + ", " + angle2 + ", " + angle3 + ", " + angle4 + ", " + angle5 + "}");
+  Serial.println("{" + String(angle1) + ", " + String(angle2) + ", " + String(angle3) + ", " + String(angle4) + ", " + String(angle5) + "}");
 
   delay(500);
   String message = "not found";
