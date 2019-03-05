@@ -208,7 +208,10 @@ void performCalibration() {
       }
       int average = total / SAMPLES;
       letterMatrix[letter][finger] = average;
+      Serial.print(String(average));
+      Serial.print(", ");
     }
+    Serial.println();
 
     // Calculate error delta for each finger of every letter.
     for (int finger = 0; finger < FINGERS; finger++) {
@@ -227,8 +230,12 @@ void performCalibration() {
           }
         }
       } // End samples
-      error[letter][finger] = abs(maxVal - minVal);
-    } // End finger
+      int error = abs(maxVal - minVal);
+      error[letter][finger] = error;
+      Serial.print(String(error));
+      Serial.print(", ");
+    }
+    Serial.println();
     
   }
 }
@@ -264,14 +271,14 @@ int readFingerByIndex (int finger) {
 
 int readFinger(const int FLEX_PIN, int fingerNumber){
   //Serial.print("finger number " + String(fingerNumber));
-  int flexADC1 = analogRead(FLEX_PIN);
-  int flexV1 = flexADC1 * VCC / 1023.0;
-  int flexR1 = R_DIV * (VCC / flexV1 - 1.0);
+  float flexADC1 = analogRead(FLEX_PIN);
+  float flexV1 = flexADC1 * VCC / 1023.0;
+  float flexR1 = R_DIV * (VCC / flexV1 - 1.0);
   //Serial.print(" Resistance: " + String(flexR1) + " ohms");
 
   // Use the calculated resistance to estimate the sensor's
   // bend angle:
-  int angle1 = map(flexR1, STRAIGHT_RESISTANCE[fingerNumber - 1], BEND_RESISTANCE[fingerNumber - 1],
+  float angle1 = map(flexR1, STRAIGHT_RESISTANCE[fingerNumber - 1], BEND_RESISTANCE[fingerNumber - 1],
                    0, 90.0);
   //Serial.print(" Bend: " + String(angle1) + " degrees");
     //Serial.println();
