@@ -230,9 +230,9 @@ void performCalibration() {
           }
         }
       } // End samples
-      int error = abs(maxVal - minVal);
-      error[letter][finger] = error;
-      Serial.print(String(error));
+      int curError = abs(maxVal - minVal);
+      error[letter][finger] = curError;
+      Serial.print(String(curError));
       Serial.print(", ");
     }
     Serial.println();
@@ -270,7 +270,7 @@ int readFingerByIndex (int finger) {
 }
 
 int readFinger(const int FLEX_PIN, int fingerNumber){
-  //Serial.print("finger number " + String(fingerNumber));
+  Serial.print("Value read from: " + String(fingerNumber));
   float flexADC1 = analogRead(FLEX_PIN);
   float flexV1 = flexADC1 * VCC / 1023.0;
   float flexR1 = R_DIV * (VCC / flexV1 - 1.0);
@@ -282,6 +282,7 @@ int readFinger(const int FLEX_PIN, int fingerNumber){
                    0, 90.0);
   //Serial.print(" Bend: " + String(angle1) + " degrees");
     //Serial.println();
-  Serial.print(String(angle1));
-return angle1;
+  Serial.print(String(angle1) + ", ");
+  Serial.println(String (((int) angle1)));
+return (int) angle1;
 }
