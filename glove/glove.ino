@@ -108,20 +108,13 @@ void setup()
 
 void loop() 
 {
-  Serial.print("{");
   int angle1 = readFinger(FLEX_PIN1,1);
-  Serial.print(", ");
   int angle2 = readFinger(FLEX_PIN2,2);
-  Serial.print(", ");
   int angle3 = readFinger(FLEX_PIN3,3);
-  Serial.print(", ");
   int angle4 = readFinger(FLEX_PIN4,4);
-  Serial.print(", ");
   int angle5 = readFinger(FLEX_PIN5,5);
-  Serial.print("}");
-  Serial.print(", ");
-  
-  Serial.println();
+  Serial.println("{" + angle1 + ", " + angle2 + ", " + angle3 + ", " + angle4 + ", " + angle5 + "}");
+
   delay(500);
   String message = "not found";
   for(int i = 0; i < 26; i++){
@@ -159,12 +152,7 @@ void loop()
     }
   }
 
-  Serial.println(letter);
-}
-
-int getFingerPin (int number) {
-
-  
+  Serial.println(message);
 }
 
 void performCalibration() {
