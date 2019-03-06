@@ -191,7 +191,7 @@ void determineLetterNew() {
     }
   }
 
-  Serial.println(String(bestConfidence) + "% confident that the letter is " + String(bestLetter));
+  Serial.println(String(bestConfidence) + "% confident that the letter is " + String((char) bestLetter + 65));
 }
 
 // 76% confident the letter is A
