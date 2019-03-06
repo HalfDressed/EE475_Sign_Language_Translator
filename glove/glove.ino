@@ -21,7 +21,11 @@ const float STRAIGHT_RESISTANCE [5] = {53523.38, 48154.52, 53945.73, 47407.23, 5
 const float BEND_RESISTANCE [5] = {99305.13, 139394.22, 123000.0, 126666.67, 136562.5}; // Resistance at 90 deg
 
 // Contains all 5 sensor value (each finger) for every letter of the alphabet
-// NOTES: ***G = Q, ***H = U = V, ***I = J 
+// NOTES: 
+//  G = Q
+//  H = U = V
+//  I = J 
+
 int letterMatrix[26][5] = { 
   {19.00, 97.00, 89.00, 90.00, 95.00},    //A
   {52.00, 2.00, 0.00, 0.00, 3.00},        //B
@@ -79,13 +83,10 @@ int error[26][5] = {
   {15, 15,  15, 15, 15}, //Y
   {15, 15,  15, 15, 15}, //Z
 };
-//int letterMatrix[26][5] = allen[26][5];
-
-// TODO: File file = SD.open("gloveData", FILE_WRITE);
-
 
 void setup() 
 {
+  // Setup sensors
   Serial.begin(9600);
   pinMode(FLEX_PIN1, INPUT);
   Serial.begin(9600);
@@ -96,25 +97,32 @@ void setup()
   pinMode(FLEX_PIN4, INPUT);
   Serial.begin(9600);
   pinMode(FLEX_PIN5, INPUT);
+
+  // Greeting and determine mode. 
   Serial.println("Welcome to G.L.O.V.E ASL translator. Please select one of the following options:");
   Serial.print("Calibrate glove (c) or use default values (d): ");
-  //delay(200);
-  
   while (!Serial.available());    // is a character available? 
   char rx_byte = Serial.read();
   Serial.println(rx_byte);
   if(rx_byte == 'c'){ // Callibrate mode
     performCalibration();
-    Serial.println("letterMatrix **************");
+    Serial.println();
+    Serial.println("Calibrated LetterMatrix with sensor data: ");
     printMatrix(letterMatrix);
-    Serial.println("error *********************");
+    
+    Serial.println();
+    Serial.println("Calibrated errorMatrix with sensor sample tolerance: ");
     printMatrix(error);
     Serial.println();
   }
 }
 
 void loop() {
+  Serial.println("OLD METHOD BELOW: ");
   determineLetterOLD();
+
+  Serial.println("NEW METTHOD BELOW: ");
+  determineLetterNew();
 }
 
 void determineLetterOLD() {
@@ -123,7 +131,7 @@ void determineLetterOLD() {
   int angle3 = readFinger(FLEX_PIN3,3);
   int angle4 = readFinger(FLEX_PIN4,4);
   int angle5 = readFinger(FLEX_PIN5,5);
-  Serial.println("{" + String(angle1) + ", " + String(angle2) + ", " + String(angle3) + ", " + String(angle4) + ", " + String(angle5) + "}");
+  Serial.println ("{" + String(angle1) + ", " + String(angle2) + ", " + String(angle3) + ", " + String(angle4) + ", " + String(angle5) + "}");
 
   delay(500);
   String message = "not found";
@@ -147,24 +155,46 @@ void determineLetterOLD() {
                   if(angle5<=currAngle5+error[i][4] && angle5>= currAngle5-error[i][4]){
                       currDiff += abs(currAngle5-angle5);
                       char currLetter;
-                      if(currDiff < lastDiff){
-                        currLetter = i + 65;
-                        lastDiff = currDiff;
-                        Serial.println("\t changed letter");
-                      }
-                      message = "letter = " + String(currLetter);
-                      Serial.println(message);                          
+                        if(currDiff < lastDiff){
+                          currLetter = i + 65;
+                          lastDiff = currDiff;
+                          Serial.println("\t changed letter");
+                        }
+                         message = "letter = ";
+                         Serial.print(message);
+                         Serial.println(currLetter);
+                          
                   }
              }
           }
        }
     }
   }
-  Serial.print("Final result: ");
+
   Serial.println(message);
 }
 
+void determineLetterNew() {
+  int sensorReadings [FINGERS];
+  for (int finger = 0; finger < FINGERS; finger++) {
+    sensorReadings[finger] = readFingerByIndex(finger);
+  }
 
+  // find best match
+  int bestLetter = -1;
+  int bestConfidence = -1;
+  for (int letter = 0; letter < LETTERS; letter++) {
+    int confidence = compareLetterHand(letter, sensorReadings);
+    if (confidence >= bestConfidence) {
+      bestLetter = letter;
+      bestConfidence = confidence;
+    }
+  }
+
+  Serial.println(String(bestConfidence) + "% confident that the letter is " + String(bestLetter));
+}
+
+// 76% confident the letter is A
 
 void performCalibration() {  
   Serial.println("We are beginning the calibration process for the ASL alphabet.");
@@ -320,7 +350,5 @@ int readFinger(const int FLEX_PIN, int fingerNumber){
   // bend angle:
   float angle1 = map(flexR1, STRAIGHT_RESISTANCE[fingerNumber - 1], BEND_RESISTANCE[fingerNumber - 1],
                    0, 90.0);
-  //Serial.print("{" + String(angle1) + ", ");
-  //Serial.println(String(((int) angle1)) + "}");
 return (int) angle1;
 }
