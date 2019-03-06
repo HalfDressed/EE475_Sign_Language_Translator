@@ -15,6 +15,6 @@ while True:
             print('Recieved key ')
             print(key)
             arduino.write(key_byte)
-        if line.startswith('letter = ') and line[-3].isupper():
+        if line.startswith('Final result') and line[-3].isupper():
             letter = line[-3]
             playsound('alphabet/%s.wav' % str(letter))
