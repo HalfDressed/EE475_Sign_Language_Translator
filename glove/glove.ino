@@ -175,16 +175,18 @@ void determineLetterOLD() {
 }
 
 void determineLetterNew() {
+  // Collect samples
   int sensorReadings [FINGERS];
   for (int finger = 0; finger < FINGERS; finger++) {
     sensorReadings[finger] = readFingerByIndex(finger);
   }
 
-  // find best match
+  // Find best match
   int bestLetter = -1;
   int bestConfidence = -1;
   for (int letter = 0; letter < LETTERS; letter++) {
     int confidence = compareLetterHand(letter, sensorReadings);
+    Serial.println("\t confidence for " + String((char) (65 + letter)) + " is " + String(confidence));
     if (confidence >= bestConfidence) {
       bestLetter = letter;
       bestConfidence = confidence;
@@ -213,7 +215,7 @@ void performCalibration() {
       for (int k = 3; k > 0; k--) {
         Serial.print(String(k));
         Serial.print("...");
-        delay(750); // 1000ms = 1 second delay. 
+        delay(750); // ms delay 1000ms = 1s
       }
       Serial.print("0... ");
       for (int k = 0; k < FINGERS; k++) {
@@ -225,11 +227,11 @@ void performCalibration() {
     
     // Average all samples and store
     for (int finger = 0; finger < FINGERS; finger++) {
-      int total = 0;
+      int sum = 0;
       for (int sample = 0; sample < SAMPLES; sample++) {
-        total += finger_samples[finger][sample];
+        sum += finger_samples[finger][sample];
       }
-      int average = total / SAMPLES;
+      int average = sum / SAMPLES;
       letterMatrix[letter][finger] = average;
     }
     
