@@ -137,22 +137,20 @@ void loop()
                   if(angle5<=currAngle5+error[i][4] && angle5>= currAngle5-error[i][4]){
                       currDiff += abs(currAngle5-angle5);
                       char currLetter;
-                        if(currDiff < lastDiff){
-                          currLetter = i + 65;
-                          lastDiff = currDiff;
-                          Serial.println("\t changed letter");
-                        }
-                         message = "letter = ";
-                         Serial.print(message);
-                         Serial.println(currLetter);
-                          
+                      if(currDiff < lastDiff){
+                        currLetter = i + 65;
+                        lastDiff = currDiff;
+                        Serial.println("\t changed letter");
+                      }
+                      message = "letter = " + String(currLetter);
+                      Serial.println(message);                          
                   }
              }
           }
        }
     }
   }
-
+  Serial.print("Final result: ");
   Serial.println(message);
 }
 
