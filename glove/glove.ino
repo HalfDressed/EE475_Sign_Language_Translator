@@ -97,12 +97,13 @@ void setup()
   while (!Serial.available());    // is a character available? 
   char rx_byte = Serial.read();
   Serial.println(rx_byte);
-  if(rx_byte == 'd'){
-    return;
-  } else {
+  if(rx_byte == 'c'){
     performCalibration();
+    Serial.println("letterMatrix **************");
     printMatrix(26, 5, letterMatrix);
+    Serial.println("error *********************");
     printMatrix(26, 5, error);
+    Serial.println();
   }
 }
 
@@ -156,7 +157,7 @@ void loop()
 }
 
 void performCalibration() {
-  int SAMPLES = 10;
+  int SAMPLES = 5;
   int FINGERS = 5;
   int LETTERS = 26;
 
@@ -170,7 +171,7 @@ void performCalibration() {
     Serial.print(String(curr));
     Serial.print("...");
     // Print 5 second count down to sampling
-    for (int j = 5; j > 0; j--) {
+    for (int j = 3; j > 0; j--) {
       Serial.print(String(j));
       Serial.print("...");
       delay(1000); // 1000ms = 1 second delay. 
@@ -185,7 +186,7 @@ void performCalibration() {
         finger_samples[k][j] = readFingerByIndex(k);
       }
       Serial.println("\t Sample Taken");
-      delay (500); // 500ms delay
+      delay (150); // 500ms delay
     }
     Serial.println(" DONE");
     
@@ -235,9 +236,11 @@ void printMatrix (int rows, int columns, int data[26][5]) {
     Serial.print("{");
     for (int column = 0; column < columns; column++) {
       Serial.print(String(data[row][column]));
-      Serial.print(", ");
+      if (column != columns - 1) {
+        Serial.print(", ");
+      }
     }
-    Serial.println("}, ");
+    Serial.println("},\t\t //" + String(65 + row));
   }
   Serial.println("}");
 }
@@ -245,16 +248,36 @@ void printMatrix (int rows, int columns, int data[26][5]) {
 // 0 based indexing from right most finger to left most finger. 
 // Finger 0 = thumb .. finger 4 = pinky.
 int readFingerByIndex (int finger) {
-  if (finger = 0) {
+  if (finger == 0) {
     return readFinger(FLEX_PIN1, 1);
-  } else if (finger = 1) {
+  } else if (finger == 1) {
     return readFinger(FLEX_PIN2, 2);
-  } else if (finger = 2) {
+  } else if (finger == 2) {
     return readFinger(FLEX_PIN3, 3);
-  } else if (finger = 3) {
+  } else if (finger == 3) {
     return readFinger(FLEX_PIN4, 4);
-  } else if (finger = 4) {
+  } else if (finger == 4) {
     return readFinger(FLEX_PIN5, 5);
+  }
+}
+
+void waitTillHandFlat() {
+  int done = 0;
+  while (!done) {
+    
+  }
+}
+
+int checkErrorFinger (int letter, int finger, int reading) {
+  return (reading <= reading + error[letter][finger]) && (reading>= reading - error[letter][finger]);
+}
+
+int checkErrorHand (int letter, int reading) {
+  int FINGERS = 5;
+  for (int finger = 0; finger < FINGERS; finger++) {
+    if (!checkErrorFinger(letter, finger, reading)){
+      return 0;
+    }
   }
 }
 
