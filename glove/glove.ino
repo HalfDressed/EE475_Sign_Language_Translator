@@ -28,62 +28,62 @@ const float BEND_RESISTANCE [5] = {99305.13, 139394.22, 123000.0, 126666.67, 136
 //  H = U = V
 //  I = J 
 
-int letterMatrix[26][5] = { 
-  {19.00, 97.00, 89.00, 90.00, 95.00},    //A
-  {52.00, 2.00, 0.00, 0.00, 3.00},        //B
-  {22.00, 17.00, 26.00, 14.00, 4.00},     //C
-  {15.00, 6.00, 44.00, 44.00, 39.00},     //D
-  {75.00, 75.00, 86.00, 79.00, 64.00},    //E
-  {13.00, 51.00, 6.00, 2.00, 5.00},       //F
-  {3.00, 23.00, 99.00, 100.00, 104.00},   //G TODO: same as Q
-  {26.00, 12.00, 6.00, 64.00, 57.00},     //H TODO: same as U and V
-  {39.00, 87.00, 82.00, 79.00, 21.00},    //I TODO: same as J
-  {39.00, 87.00, 82.00, 79.00, 21.00},    //J TODO: same as I
-  {2.00, 6.00, 34.00, 78.00, 84.00},      //K
-  {-7.00, 5.00, 100.00, 79.00, 90.00},    //L
-  {59.00, 93.00, 60.00, 59.00, 66.00},    //M
-  {36.00, 92.00, 58.00, 64.00, 67.00},    //N
-  {14.00, 52.00, 39.00, 33.00, 24.00},    //O
-  {0.00, 9.00, 24.00, 65.00, 72.00},      //P
-  {3.00, 23.00, 99.00, 100.00, 104.00},   //Q TODO: same as G
-  {32.00, 7.00, 4.00, 87.00, 84.00},      //R
-  {43.00, 113.00, 114.00, 104.00, 114.00},//S
-  {21.00, 73.00, 76.00, 70.00, 88.00},    //T
-  {30.00, 4.00, 1.00, 71.00, 64.00},      //U TODO: same as H and V
-  {34.00, 7.00, 0.00, 62.00, 64.00},      //V TODO: same as H and U
-  {39.00, 8.00, 4.00, 2.00, 49.00},       //W
-  {33.00, 42.00, 104.00, 92.00, 86.00},   //X
-  {-2.00, 97.00, 61.00, 66.00, 16.00},    //Y
-  {33.00, 12.00, 91.00, 85.00, 102.00},   //Z
+int letterMatrix[26][5] = {
+  {27, 123, 108, 111, 120},    //A
+  {50, 4, 2, 1, 1},    //B
+  {55, 64, 69, 69, 42},    //C
+  {33, 10, 60, 65, 54},    //D
+  {87, 89, 92, 81, 71},    //E
+  {29, 68, 11, 4, 4},    //F
+  {1, 33, 115, 120, 117},    //G
+  {64, 17, 9, 76, 77},     //H
+  {18, 115, 92, 74, 18},     //I
+  {18, 80, 57, 42, 13},    //J
+  {12, 19, 45, 92, 106},     //K
+  {-4, 7, 133, 116, 133},    //L
+  {86, 128, 98, 92, 87},     //M
+  {56, 120, 89, 100, 115},     //N
+  {25, 69, 55, 53, 51},    //O
+  {13, 17, 34, 78, 97},    //P
+  {2, 33, 111, 102, 109},    //Q
+  {43, 10, 8, 96, 91},     //R
+  {51, 133, 124, 121, 122},    //S
+  {31, 105, 100, 94, 114},     //T
+  {47, 8, 4, 87, 92},    //U
+  {44, 6, 1, 71, 84},    //V
+  {63, 11, 11, 6, 69},     //W
+  {59, 66, 108, 106, 111},     //X
+  {-7, 125, 98, 80, 16},     //Y
+  {47, 15, 112, 106, 105},     //Z
 };
 
 int error[26][5] = {
-  {15, 15,  15, 15, 15}, //A
-  {15, 15,  15, 15, 15}, //B
-  {15, 15,  15, 15, 15}, //C
-  {15, 15,  15, 15, 15}, //D
-  {15, 15,  15, 15, 15}, //E
-  {15, 15,  15, 15, 15}, //F
-  {15, 15,  15, 15, 15}, //G
-  {15, 15,  15, 15, 15}, //H
-  {15, 15,  15, 15, 15}, //I
-  {15, 15,  15, 15, 15}, //J
-  {15, 15,  15, 15, 15}, //K
-  {15, 15,  15, 15, 15}, //L
-  {15, 15,  15, 15, 15}, //M
-  {15, 15,  15, 15, 15}, //N
-  {15, 15,  15, 15, 15}, //O
-  {15, 15,  15, 15, 15}, //P
-  {15, 15,  15, 15, 15}, //Q
-  {15, 15,  15, 15, 15}, //R
-  {15, 15,  15, 15, 15}, //S
-  {15, 15,  15, 15, 15}, //T
-  {15, 15,  15, 15, 15}, //U
-  {15, 15,  15, 15, 15}, //V
-  {15, 15,  15, 15, 15}, //W
-  {15, 15,  15, 15, 15}, //X
-  {15, 15,  15, 15, 15}, //Y
-  {15, 15,  15, 15, 15}, //Z
+ {10, 10, 10, 10, 10},    //A
+  {13, 10, 10, 10, 10},    //B
+  {10, 10, 15, 12, 26},    //C
+  {10, 10, 10, 10, 10},    //D
+  {19, 10, 10, 10, 10},    //E
+  {10, 10, 10, 10, 10},    //F
+  {10, 10, 10, 11, 10},    //G
+  {10, 10, 10, 17, 10},    //H
+  {16, 28, 22, 29, 10},    //I
+  {25, 28, 17, 10, 10},    //J
+  {10, 10, 10, 10, 26},    //K
+  {10, 10, 10, 10, 11},    //L
+  {10, 10, 10, 10, 11},    //M
+  {10, 14, 10, 10, 10},    //N
+  {10, 10, 10, 10, 10},    //O
+  {10, 10, 10, 12, 10},    //P
+  {10, 10, 15, 10, 14},    //Q
+  {10, 10, 10, 10, 10},    //R
+  {10, 11, 10, 10, 10},    //S
+  {13, 10, 10, 10, 10},    //T
+  {10, 10, 10, 10, 11},    //U
+  {10, 10, 10, 12, 10},    //V
+  {10, 10, 10, 10, 10},    //W
+  {10, 10, 10, 10, 21},    //X
+  {10, 27, 21, 28, 10},    //Y
+  {10, 10, 17, 15, 25},    //Z
 };
 
 // Side and up tilt
@@ -118,7 +118,7 @@ int letterTilt[26][2] = {
 };
 
 
-String sound = "ON";
+String sound = "OFF";
 
 void setup() 
 {
@@ -151,23 +151,31 @@ void setup()
     printMatrix(error);
     Serial.println();
   }
-  Serial.print("Sound is ON. Toggle sound with s");
+  Serial.println("Sound is " + sound + ". Toggle sound with s");
 }
 
 void loop() 
 {
-  // Get commands
-  char command_recieved = Serial.read();
-  if(command_recieved == 's'){
-    // Toggle the audio on and off
-    if(sound == "ON"){
-      sound = "OFF";
+  delay(1000);
+  // Get commands  
+  if(Serial.available()){
+    char command_recieved = Serial.read();
+    delay(1000);
+    Serial.println("Recieved @@@@@@@@@@@@@@@@");
+    Serial.println(command_recieved);
+    if(command_recieved == 's'){
+      // Toggle the audio on and off
+      if(sound == "ON"){
+        sound = "OFF";
+      }
+      else {
+        sound = "ON";
+      }
+      Serial.println("Sound is " + sound);
     }
-    else {
-      sound = "ON";
-    }
-    Serial.println("Sound is " + sound);
   }
+  
+  
   //Serial.println("OLD METHOD BELOW: ");
   //determineLetterOLD();
 
@@ -241,19 +249,20 @@ void determineLetterNew() {
   int bestConfidence = -1;
   for (int letter = 0; letter < LETTERS; letter++) {
     // Check tilt
-    if(handTiltSide != letterTilt[letter][0] || handTiltUp != letterTilt[letter][1]){
-      continue;
-    }
+    //if(handTiltSide != letterTilt[letter][0] || handTiltUp != letterTilt[letter][1]){
+    //  continue;
+    //}
     
     int confidence = compareLetterHand(letter, sensorReadings);
-    Serial.println("\t confidence for " + String((char) (65 + letter)) + " is " + String(confidence));
+    Serial.println("\t confidence for " + String(((char)(65 + letter))) + " is " + String(confidence));
     if (confidence >= bestConfidence) {
       bestLetter = letter;
       bestConfidence = confidence;
     }
   }
 
-  Serial.println(String(bestConfidence) + "% confident that the letter is " + String((char) bestLetter + 65));
+  Serial.println(String(bestConfidence) + "% confident that the letter is " + String(((char)(bestLetter + 65))));
+  delay(500);
 }
 
 // 76% confident the letter is A
@@ -267,7 +276,7 @@ void performCalibration() {
     int finger_samples [FINGERS][SAMPLES];
     int finger_error_delta [FINGERS];
 
-    Serial.print("Calibrating letter: " + String(curr));
+    Serial.println("Calibrating letter: " + String(curr));
     for (int j = 0; j < SAMPLES; j++) {
       Serial.println("\t Waiting until hand is flat...");
       waitUntilHandFlat();
@@ -321,10 +330,12 @@ void performCalibration() {
     }
 
     // DEBUG ************************
-    Serial.println("letterMatrix:");
+    Serial.print("letterMatrix:\n");
     printMatrixRow(letter, letterMatrix); // Print stored values for each letter avg
-    Serial.println("errorMatrix:");
+    Serial.println();
+    Serial.print("errorMatrix:\n");
     printMatrixRow(letter, error); // Print stored values for each letter error
+    Serial.println();
   }
 }
 
@@ -332,7 +343,7 @@ void performCalibration() {
 void printMatrix (int data[26][5]) {
   Serial.println("{");
   for (int row = 0; row < 26; row++) {
-    Serial.print("{");
+    Serial.print("\t{");
     for (int column = 0; column < 5; column++) {
       Serial.print(String(data[row][column]));
       if (column != 4) {
@@ -353,6 +364,8 @@ void printMatrixRow (int row, int data[26][5]) {
       Serial.print(", ");
     }
   }
+  Serial.print("}");
+  Serial.println();
 }
 
 // 0 based indexing from right most finger to left most finger. 
@@ -386,16 +399,16 @@ void waitUntilHandFlat() {
 int compareLetterHand (int letter, int reading[5]) {
   float confidence = 0;
   for (int finger = 0; finger < FINGERS; finger++) {
-    float curError    = (float) error[letter][finger];
+    float tolerance    = (float) error[letter][finger];
     float actual      = (float) reading[finger];
     float expected    = (float) letterMatrix[letter][finger];
     float delta       = (float) abs(actual - expected);
-    
-    if (curError < delta) {
-      confidence += 20; // Max confidence
-    } else if (curError >= delta && curError <= (delta*2)) {
-      confidence += (int) ((20.0 - 20 * (curError / (delta*2) - 0.5)));
-    } // 0 confidence in match
+
+    int val = 0;
+    if (delta < tolerance) {
+      int val = (20/tolerance)*(tolerance - delta);
+      confidence += val; // Max confidence
+    }
   }
   return (int) confidence;
 }
