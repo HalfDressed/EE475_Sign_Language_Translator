@@ -3,6 +3,8 @@ const int FLEX_PIN2 = A1; // Pin connected to voltage divider output
 const int FLEX_PIN3 = A2; // Pin connected to voltage divider output
 const int FLEX_PIN4 = A3; // Pin connected to voltage divider output
 const int FLEX_PIN5 = A4; // Pin connected to voltage divider output
+const int SIDE_TILT_PIN = 2;
+const int UP_TILT_PIN = 3;
 
 // Global constants
 int SAMPLES = 3;
@@ -84,6 +86,40 @@ int error[26][5] = {
   {15, 15,  15, 15, 15}, //Z
 };
 
+// Side and up tilt
+// {LOW, HIGH} = up, {LOW, LOW} = down, {HIGH, LOW} = sideways
+int letterTilt[26][2] = { 
+  {LOW, HIGH}, //A
+  {LOW, HIGH}, //B
+  {LOW, HIGH}, //C
+  {LOW, HIGH}, //D
+  {LOW, HIGH}, //E
+  {LOW, HIGH}, //F
+  {HIGH, LOW}, //G
+  {HIGH, LOW}, //H
+  {LOW, HIGH}, //I
+  {LOW, HIGH}, //J TODO: not needed?
+  {LOW, HIGH}, //K
+  {LOW, HIGH}, //L
+  {LOW, HIGH}, //M
+  {LOW, HIGH}, //N
+  {LOW, HIGH}, //O
+  {LOW, LOW}, //P
+  {LOW, LOW}, //Q
+  {LOW, HIGH}, //R
+  {LOW, HIGH}, //S
+  {LOW, HIGH}, //T
+  {LOW, HIGH}, //U
+  {LOW, HIGH}, //V
+  {LOW, HIGH}, //W
+  {LOW, HIGH}, //X
+  {LOW, HIGH}, //Y
+  {LOW, HIGH}, //Z TODO: not needed?
+};
+
+
+String sound = "ON";
+
 void setup() 
 {
   // Setup sensors
@@ -115,17 +151,32 @@ void setup()
     printMatrix(error);
     Serial.println();
   }
+  Serial.print("Sound is ON. Toggle sound with s");
 }
 
-void loop() {
-  Serial.println("OLD METHOD BELOW: ");
-  determineLetterOLD();
+void loop() 
+{
+  // Get commands
+  char command_recieved = Serial.read();
+  if(command_recieved == 's'){
+    // Toggle the audio on and off
+    if(sound == "ON"){
+      sound = "OFF";
+    }
+    else {
+      sound = "ON";
+    }
+    Serial.println("Sound is " + sound);
+  }
+  //Serial.println("OLD METHOD BELOW: ");
+  //determineLetterOLD();
 
   Serial.println("NEW METTHOD BELOW: ");
   determineLetterNew();
 }
 
 void determineLetterOLD() {
+   
   int angle1 = readFinger(FLEX_PIN1,1);
   int angle2 = readFinger(FLEX_PIN2,2);
   int angle3 = readFinger(FLEX_PIN3,3);
@@ -175,6 +226,10 @@ void determineLetterOLD() {
 }
 
 void determineLetterNew() {
+  // Tilt switches
+  int handTiltSide = digitalRead(SIDE_TILT_PIN);
+  int handTiltUp = digitalRead(UP_TILT_PIN);
+
   // Collect samples
   int sensorReadings [FINGERS];
   for (int finger = 0; finger < FINGERS; finger++) {
@@ -185,6 +240,11 @@ void determineLetterNew() {
   int bestLetter = -1;
   int bestConfidence = -1;
   for (int letter = 0; letter < LETTERS; letter++) {
+    // Check tilt
+    if(handTiltSide != letterTilt[letter][0] || handTiltUp != letterTilt[letter][1]){
+      continue;
+    }
+    
     int confidence = compareLetterHand(letter, sensorReadings);
     Serial.println("\t confidence for " + String((char) (65 + letter)) + " is " + String(confidence));
     if (confidence >= bestConfidence) {
