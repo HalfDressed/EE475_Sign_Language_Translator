@@ -175,8 +175,8 @@ char getCommands() {
   if(Serial.available()){
     char command_recieved = Serial.read();
     delay(1000);
-    Serial.println("Recieved @@@@@@@@@@@@@@@@");
-    Serial.println(command_recieved);
+    //Serial.println("Recieved @@@@@@@@@@@@@@@@");
+    //Serial.println(command_recieved);
     if(command_recieved == 's'){
       // Toggle the audio on and off
       if(sound == "ON"){
@@ -268,13 +268,13 @@ void performCalibration() {
     for (int j = 0; j < SAMPLES; j++) {
       Serial.println("\t Waiting until hand is flat...");
       waitUntilHandFlat();
-      Serial.print("\t Sampling letter in ");
+      Serial.print("\t Sampling letter in \n");
       for (int k = 3; k > 0; k--) {
-        Serial.print(String(k));
+        Serial.print("\t " + String(k));
         Serial.print("...");
         delay(750); // ms delay 1000ms = 1s
       }
-      Serial.print("0... ");
+      Serial.print("\t 0... \n");
       for (int k = 0; k < FINGERS; k++) {
         finger_samples[k][j] = readFingerByIndex(k);
       }
