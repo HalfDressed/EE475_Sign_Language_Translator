@@ -13,7 +13,6 @@ int LETTERS = 26;
 int MIN_ERROR_DELTA = 5; // Ensures some range of motion. Enforced when determining confidence. 
 int TILT_CONFIDENCE = 25; // +/- amount that is added if BOTH tilt sensors are correct
 
-
 // Measure the voltage at 5V and the actual resistance of your
 // 47k resistor, and enter them below:
 const float VCC = 4.98; // Measured voltage of Ardunio 5V line
@@ -29,7 +28,7 @@ const float BEND_RESISTANCE [5] = {99305.13, 139394.22, 123000.0, 126666.67, 136
 //  G = Q
 //  H = U = V
 //  I = J 
-// 0 == Thumb, 4== pink
+// 0 == Thumb, 4== pinky
 int letterMatrix[26][5] = {
   {25, 126, 116, 116, 128},    //A
   {53, 4, 2, 3, 4},    //B
@@ -174,7 +173,10 @@ void loop()
 char getCommands() { 
   if(Serial.available()){
     char command_recieved = Serial.read();
-    delay(1000);
+    while(Serial.available()){
+      Serial.read();
+    }
+    delay(500);
     //Serial.println("Recieved @@@@@@@@@@@@@@@@");
     //Serial.println(command_recieved);
     if(command_recieved == 's'){
@@ -212,7 +214,6 @@ int compareLetterHand (int letter, int reading[5]) {
   }
   return (int) confidence;
 }
-
 
 // Displays best letter match to sensorReadings
 void determineLetter(int sensorReadings [5]) {
@@ -280,8 +281,14 @@ void performCalibration() {
       }
       Serial.println("Completed!");
       if(getCommands() == '-') {
-        letter -=1;
-        continue;
+        if(letter == 0){
+          letter =-1;
+        }
+        else {
+          letter -=2;
+        }
+        Serial.println("Returning to previous letter");
+        break;
       }
       Serial.println();
     }
