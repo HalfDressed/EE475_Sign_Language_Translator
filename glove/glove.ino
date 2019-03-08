@@ -252,8 +252,8 @@ void determineLetterNew() {
   }
   
   for (int letter = 0; letter < LETTERS; letter++) {
-    // Check tilt
-    //if(handTiltSide != letterTilt[letter][0] || handTiltUp != letterTilt[letter][1]){
+    // Check tilt if letter is not j
+    //if(letter == 10 || handTiltSide != letterTilt[letter][0] || handTiltUp != letterTilt[letter][1]){
     //  continue;
     //}
     
