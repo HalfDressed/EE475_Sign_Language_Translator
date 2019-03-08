@@ -10,7 +10,9 @@ const int UP_TILT_PIN = 3;
 int SAMPLES = 3;
 int FINGERS = 5;
 int LETTERS = 26;
-int MIN_ERROR_DELTA = 5;
+int MIN_ERROR_DELTA = 5; // Ensures some range of motion. Enforced when determining confidence. 
+int TILT_CONFIDENCE = 25; // +/- amount that is added if BOTH tilt sensors are correct
+
 
 // Measure the voltage at 5V and the actual resistance of your
 // 47k resistor, and enter them below:
@@ -38,7 +40,7 @@ int letterMatrix[26][5] = {
   {4, 38, 117, 124, 127},    //G
   {63, 15, 7, 78, 86},     //H
   {28, 89, 59, 60, 7},     //I
-  {27, 90, 64, 62, 10},    //J
+  {27, 90, 64, 62, 15},    //J
   {6, 21, 38, 95, 112},    //K
   {-5, 5, 128, 111, 128},    //L
   {83, 123, 99, 94, 83},     //M
@@ -59,7 +61,7 @@ int letterMatrix[26][5] = {
 
 
 int error[26][5] = {
- {6, 7, 5, 5, 5},     //A
+  {6, 7, 5, 5, 5},     //A
   {12, 5, 5, 5, 5},    //B
   {15, 5, 5, 5, 7},    //C
   {5, 5, 5, 7, 12},    //D
@@ -159,14 +161,17 @@ void loop()
 {
   delay(1000);
   getCommands();
-    
-  //Serial.println("OLD METHOD BELOW: ");
-  //determineLetterOLD();
 
-  Serial.println("NEW METTHOD BELOW: ");
-  determineLetterNew();
+  // Collect samples
+  int sensorReadings [FINGERS];
+  for (int finger = 0; finger < FINGERS; finger++) {
+    sensorReadings[finger] = readFingerByIndex(finger);
+  }
+  
+  determineLetter(sensorReadings);
 }
 
+// Processes commands from python script. 
 char getCommands() { 
   if(Serial.available()){
     char command_recieved = Serial.read();
@@ -190,96 +195,73 @@ char getCommands() {
   }
 }
 
-void determineLetterOLD() {
-   
-  int angle1 = readFinger(FLEX_PIN1,1);
-  int angle2 = readFinger(FLEX_PIN2,2);
-  int angle3 = readFinger(FLEX_PIN3,3);
-  int angle4 = readFinger(FLEX_PIN4,4);
-  int angle5 = readFinger(FLEX_PIN5,5);
-  Serial.println ("{" + String(angle1) + ", " + String(angle2) + ", " + String(angle3) + ", " + String(angle4) + ", " + String(angle5) + "}");
-
-  delay(500);
-  String message = "not found";
-  for(int i = 0; i < 26; i++){
-    int currDiff = 0;
-    int lastDiff = 999999;
-    int currAngle1 = letterMatrix[i][0];
-    int currAngle2 = letterMatrix[i][1];
-    int currAngle3 = letterMatrix[i][2];
-    int currAngle4 = letterMatrix[i][3];
-    int currAngle5 = letterMatrix[i][4];    //5 is the range. So value can be + or - 5 from actual to be correct, 
-    //                                        we can change this value to have a higher or lower tolerance
-    if(angle1<=currAngle1+error[i][0] && angle1>= currAngle1-error[i][0]){
-       currDiff += abs(currAngle1-angle1);
-       if(angle2<=currAngle2+error[i][1] && angle2>= currAngle2-error[i][1]){
-          currDiff += abs(currAngle2-angle2);
-          if(angle3<=currAngle3+error[i][2] && angle3>= currAngle3-error[i][2]){
-              currDiff += abs(currAngle3-angle3);
-              if(angle4<=currAngle4+error[i][3]&& angle4>= currAngle4-error[i][3]){
-                  currDiff += abs(currAngle4-angle4);
-                  if(angle5<=currAngle5+error[i][4] && angle5>= currAngle5-error[i][4]){
-                      currDiff += abs(currAngle5-angle5);
-                      char currLetter;
-                        if(currDiff < lastDiff){
-                          currLetter = i + 65;
-                          lastDiff = currDiff;
-                          Serial.println("\t changed letter");
-                        }
-                         message = "letter = ";
-                         Serial.print(message);
-                         Serial.println(currLetter);
-                          
-                  }
-             }
-          }
-       }
+// Returns confidence 0-100 of reading matching letter based on LetterMatrix and error values
+int compareLetterHand (int letter, int reading[5]) {
+  float confidence = 0;
+  for (int finger = 0; finger < FINGERS; finger++) {
+    float actual      = (float) reading[finger];
+    float expected    = (float) letterMatrix[letter][finger];
+    float delta       = (float) abs(actual - expected);
+    float tolerance   = (float) error[letter][finger];
+    
+    if (tolerance < MIN_ERROR_DELTA) { // Ensures a minimum error tolerance
+        tolerance = MIN_ERROR_DELTA;
     }
+      
+    int val = (20/tolerance)*(tolerance - delta);
+    confidence += val; // Max confidence
   }
-
-  Serial.println(message);
+  return (int) confidence;
 }
 
-void determineLetterNew() {
+
+// Displays best letter match to sensorReadings
+void determineLetter(int sensorReadings [5]) {
   // Tilt switches
   int handTiltSide = digitalRead(SIDE_TILT_PIN);
   int handTiltUp = digitalRead(UP_TILT_PIN);
 
-  // Collect samples
-  int sensorReadings [FINGERS];
-  for (int finger = 0; finger < FINGERS; finger++) {
-    sensorReadings[finger] = readFingerByIndex(finger);
-  }
-  
+  // Find best letter match
+  int bestLetter = -1;
+  int bestConfidence = -1;
   for (int letter = 0; letter < LETTERS; letter++) {
-    // Check tilt
-    //if(handTiltSide != letterTilt[letter][0] || handTiltUp != letterTilt[letter][1]){
-    //  continue;
-    //}
-    
-    int confidence = compareLetterHand(letter, sensorReadings);
-    Serial.println("\t confidence for " + String(((char)(65 + letter))) + " is " + String(confidence));
-    if (letter == 0) { // default to first letter
+    // Take into consideration tilt sensor readings
+    int tiltSensor = -1;
+    if(handTiltSide != letterTilt[letter][0] || handTiltUp != letterTilt[letter][1]){
+      tiltSensor = TILT_CONFIDENCE;
+    } else {
+      tiltSensor = -TILT_CONFIDENCE;
+    }
+
+    // Determine confidence for this letter
+    int letterConfidence = compareLetterHand(letter, sensorReadings) + tiltSensor;
+    Serial.println("\t confidence for " + String(getLetter(letter)) + " is " + String(letterConfidence));
+    if (letter == 0 || letterConfidence >= bestConfidence) {
       bestLetter = letter;
-      bestConfidence = confidence;
-    } else if (confidence >= bestConfidence) {
-      bestLetter = letter;
-      bestConfidence = confidence;
+      bestConfidence = letterConfidence;
     }
   }
 
-  Serial.println(String(bestConfidence) + "% confident that the letter is " + String(((char)(bestLetter + 65))));
-  delay(500);
+  int displayConfidence = 0;
+  if (bestConfidence >= 0) {
+    displayConfidence = 100;
+  } else {
+    displayConfidence = (int) abs(100.0 * abs(((float) bestConfidence) / 1000.0));
+  }
+  
+  Serial.println("Display confidence: " + String(displayConfidence));
+  Serial.println(String(bestConfidence) + "% confident that the letter is " + String(getLetter(bestLetter)));
+  delay(500); // Repurpose
 }
 
-// 76% confident the letter is A
-
+// Calibrates expected sensor readings (letterMatrix) and their tolerances (error) for every alphabetic letter.
+// Prints matrixs at the end for easy copy and pasting into code. 
 void performCalibration() {  
   Serial.println("We are beginning the calibration process for the ASL alphabet.");
   Serial.println();
   
   for(int letter = 0; letter < LETTERS; letter++){
-    char curr = letter + 65; // unicode A - Z;    
+    char curr = getLetter(letter); // unicode A - Z;    
     int finger_samples [FINGERS][SAMPLES];
     int finger_error_delta [FINGERS];
 
@@ -334,9 +316,6 @@ void performCalibration() {
       } // End samples
       // Store error with atleast MIN_ERROR_DELTA value. 
       int curError = abs(maxVal - minVal);
-      if (curError < MIN_ERROR_DELTA) { // Ensures a minimum error tolerance
-        curError = MIN_ERROR_DELTA;
-      }
       error[letter][finger] = curError;
     }
 
@@ -348,35 +327,6 @@ void performCalibration() {
     printMatrixRow(letter, error); // Print stored values for each letter error
     Serial.println();
   }
-}
-
-// Prints matrix to be easily copy and pasted into code. 
-void printMatrix (int data[26][5]) {
-  Serial.println("{");
-  for (int row = 0; row < 26; row++) {
-    Serial.print("\t{");
-    for (int column = 0; column < 5; column++) {
-      Serial.print(String(data[row][column]));
-      if (column != 4) {
-        Serial.print(", ");
-      }
-    }
-    Serial.println("},\t\t //" + String((char) (65 + row)));
-  }
-  Serial.println("};");
-}
-
-// Print row of matrix
-void printMatrixRow (int row, int data[26][5]) {
-  Serial.print("{");
-  for (int column = 0; column < 5; column++) {
-    Serial.print(String(data[row][column]));
-    if (column != 4) {
-      Serial.print(", ");
-    }
-  }
-  Serial.print("}");
-  Serial.println();
 }
 
 // 0 based indexing from right most finger to left most finger. 
@@ -395,33 +345,7 @@ int readFingerByIndex (int finger) {
   }
 }
 
-void waitUntilHandFlat() {
-  int flatFingers = 0;
-  while (flatFingers != 4) {
-    if (readFingerByIndex(flatFingers) <= 20) {
-      flatFingers += 1;
-    } else {
-      flatFingers = 0; // finger wasn't flat so restart.
-    }
-  }
-}
-
-// Returns confidence 0-100 of reading matching letter based on LetterMatrix and error values
-int compareLetterHand (int letter, int reading[5]) {
-  float confidence = 0;
-  for (int finger = 0; finger < FINGERS; finger++) {
-    float tolerance    = (float) error[letter][finger];
-    float actual      = (float) reading[finger];
-    float expected    = (float) letterMatrix[letter][finger];
-    float delta       = (float) abs(actual - expected);
-
-    int val = (20/tolerance)*(tolerance - delta);
-    confidence += val; // Max confidence
-  }
-  return (int) confidence;
-}
-
-
+// Returns angel of finger using FLEX_PIN reading and experimentally calibrated values for flex resistor of fingerNumber
 int readFinger(const int FLEX_PIN, int fingerNumber){
   //Serial.print("Value read from: " + String(fingerNumber));
   float flexADC1 = analogRead(FLEX_PIN);
@@ -433,5 +357,54 @@ int readFinger(const int FLEX_PIN, int fingerNumber){
   // bend angle:
   float angle1 = map(flexR1, STRAIGHT_RESISTANCE[fingerNumber - 1], BEND_RESISTANCE[fingerNumber - 1],
                    0, 90.0);
-return (int) angle1;
+  return (int) angle1;
+}
+
+// Pauses until all fingers are roughly straight
+void waitUntilHandFlat() {
+  int flatFingers = 0;
+  while (flatFingers != 4) {
+    if (readFingerByIndex(flatFingers) <= 20) {
+      flatFingers += 1;
+    } else {
+      flatFingers = 0; // A finger wasn't flat so restart.
+    }
+  }
+}
+
+// Below are useful print functions for calibration (can easily copy/paste into code) and debugging
+
+// Converts index to capital letter.
+// 0 = A, 25 = Z
+char getLetter (int index) {
+  return ((char)(65 + index));
+}
+
+// Prints entire matrix in code copy/paste format
+void printMatrix (int data[26][5]) {
+  Serial.println("{");
+  for (int row = 0; row < 26; row++) {
+    Serial.print("\t{");
+    for (int column = 0; column < 5; column++) {
+      Serial.print(String(data[row][column]));
+      if (column != 4) {
+        Serial.print(", ");
+      }
+    }
+    Serial.println("},\t\t //" + String(getLetter(row)));
+  }
+  Serial.println("};");
+}
+
+// Print row of matrix
+void printMatrixRow (int row, int data[26][5]) {
+  Serial.print("{");
+  for (int column = 0; column < 5; column++) {
+    Serial.print(String(data[row][column]));
+    if (column != 4) {
+      Serial.print(", ");
+    }
+  }
+  Serial.print("},\t //" + String (getLetter(row)));
+  Serial.println();
 }
