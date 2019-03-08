@@ -8,7 +8,7 @@ sound = False
 def on_press(key):
     try:
     #    print('alphanumeric key {0} pressed'.format(key.char))
-        print('SENDING COMMAND {0}'.format(key.char))
+        print('\nSENDING COMMAND {0}'.format(key.char))
         key_byte = key.char.encode('utf-8')
         arduino.write(key_byte)
     except AttributeError:
@@ -22,15 +22,15 @@ with keyboard.Listener(
         data = arduino.readline()
         if data:
             line = data.decode('utf-8')
-            # print whole line if it is counting down
-            if line.startswith('2') or line.startswith('1'):
-                print(line)
-            else:
+            # Get rid of newline at the end
+            if line.endswith('\n'):
                 print(line[:-2])
+            else:
+                print(line)
             if line.startswith('Calibrate glove'):
                 key = input('')
                 key_byte = key.encode('utf-8')
-                print('Recieved key ')
+                print('\nRecieved key ')
                 print(key)
                 arduino.write(key_byte)
             if line.startswith('Sound is'):
