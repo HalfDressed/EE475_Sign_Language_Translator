@@ -7,13 +7,14 @@ sound = False
 
 def on_press(key):
     try:
-    #    print('alphanumeric key {0} pressed'.format(key.char))
-        print('\nSENDING COMMAND {0}'.format(key.char))
-        key_byte = key.char.encode('utf-8')
-        arduino.write(key_byte)
+        if key.char:
+        #    print('alphanumeric key {0} pressed'.format(key.char))
+            print('\nSENDING COMMAND {0}'.format(key.char))
+            key_byte = key.char.encode('utf-8')
+            arduino.write(key_byte)
     except AttributeError:
-        print('special key {0} pressed'.format(
-            key))
+        pass
+        #print('special key {0} pressed'.format(key))
     
 # Collect events until released
 with keyboard.Listener(
