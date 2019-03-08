@@ -250,10 +250,7 @@ void determineLetterNew() {
   for (int finger = 0; finger < FINGERS; finger++) {
     sensorReadings[finger] = readFingerByIndex(finger);
   }
-
-  // Find best match
-  int bestLetter = -1;
-  int bestConfidence = -1;
+  
   for (int letter = 0; letter < LETTERS; letter++) {
     // Check tilt
     //if(handTiltSide != letterTilt[letter][0] || handTiltUp != letterTilt[letter][1]){
@@ -262,7 +259,10 @@ void determineLetterNew() {
     
     int confidence = compareLetterHand(letter, sensorReadings);
     Serial.println("\t confidence for " + String(((char)(65 + letter))) + " is " + String(confidence));
-    if (confidence >= bestConfidence) {
+    if (letter == 0) { // default to first letter
+      bestLetter = letter;
+      bestConfidence = confidence;
+    } else if (confidence >= bestConfidence) {
       bestLetter = letter;
       bestConfidence = confidence;
     }
