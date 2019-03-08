@@ -22,7 +22,11 @@ with keyboard.Listener(
         data = arduino.readline()
         if data:
             line = data.decode('utf-8')
-            print(line[:-2])
+            # print whole line if it is counting down
+            if line.startswith('2') or line.startswith('1'):
+                print(line)
+            else:
+                print(line[:-2])
             if line.startswith('Calibrate glove'):
                 key = input('')
                 key_byte = key.encode('utf-8')
