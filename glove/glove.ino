@@ -123,8 +123,7 @@ int letterTilt[26][2] = {
 
 String sound = "OFF";
 
-void setup() 
-{
+void setup() {
   // Setup sensors
   Serial.begin(9600);
   pinMode(FLEX_PIN1, INPUT);
@@ -225,7 +224,6 @@ void determineLetter(int sensorReadings [5]) {
   int bestLetter = -1;
   int bestConfidence = -1;
   for (int letter = 0; letter < LETTERS; letter++) {
-<<<<<<< HEAD
     // Take into consideration tilt sensor readings
     int tiltSensor = -1;
     if(handTiltSide != letterTilt[letter][0] || handTiltUp != letterTilt[letter][1]){
@@ -238,19 +236,6 @@ void determineLetter(int sensorReadings [5]) {
     int letterConfidence = compareLetterHand(letter, sensorReadings) + tiltSensor;
     Serial.println("\t confidence for " + String(getLetter(letter)) + " is " + String(letterConfidence));
     if (letter == 0 || letterConfidence >= bestConfidence) {
-=======
-    // Check tilt if letter is not j
-    //if(letter == 10 || handTiltSide != letterTilt[letter][0] || handTiltUp != letterTilt[letter][1]){
-    //  continue;
-    //}
-    
-    int confidence = compareLetterHand(letter, sensorReadings);
-    Serial.println("\t confidence for " + String(((char)(65 + letter))) + " is " + String(confidence));
-    if (letter == 0) { // default to first letter
-      bestLetter = letter;
-      bestConfidence = confidence;
-    } else if (confidence >= bestConfidence) {
->>>>>>> 0acd6fe92e200c43b1ece2eb35a45f2a64c31e00
       bestLetter = letter;
       bestConfidence = letterConfidence;
     }
