@@ -10,7 +10,7 @@ const int UP_TILT_PIN = 3;
 int SAMPLES = 3;
 int FINGERS = 5;
 int LETTERS = 26;
-int MIN_ERROR_DELTA = 10;
+int MIN_ERROR_DELTA = 5;
 
 // Measure the voltage at 5V and the actual resistance of your
 // 47k resistor, and enter them below:
@@ -27,7 +27,7 @@ const float BEND_RESISTANCE [5] = {99305.13, 139394.22, 123000.0, 126666.67, 136
 //  G = Q
 //  H = U = V
 //  I = J 
-
+// 0 == Thumb, 4== pink
 int letterMatrix[26][5] = {
   {27, 123, 108, 111, 120},    //A
   {50, 4, 2, 1, 1},            //B
@@ -58,7 +58,7 @@ int letterMatrix[26][5] = {
 };
 
 int error[26][5] = {
- {10, 10, 10, 10, 10},    //A
+ {10, 10, 10, 10, 10},     //A {27, 123, 108, 111, 120},
   {13, 10, 10, 10, 10},    //B
   {10, 10, 15, 12, 26},    //C
   {10, 10, 10, 10, 10},    //D
@@ -70,14 +70,14 @@ int error[26][5] = {
   {25, 28, 17, 10, 10},    //J
   {10, 10, 10, 10, 26},    //K
   {10, 10, 10, 10, 11},    //L
-  {10, 10, 10, 10, 11},    //M
-  {10, 14, 10, 10, 10},    //N
+  {10, 10, 10, 10, 11},    //M  Expected Readings: {86, 128, 98, 92, 87},
+  {10, 14, 10, 10, 10},    //N  Expected Readings: {56, 120, 89, 100, 115},
   {10, 10, 10, 10, 10},    //O
   {10, 10, 10, 12, 10},    //P
   {10, 10, 15, 10, 14},    //Q
   {10, 10, 10, 10, 10},    //R
   {10, 11, 10, 10, 10},    //S
-  {13, 10, 10, 10, 10},    //T
+  {13, 10, 10, 10, 10},    //T {31, 105, 100, 94, 114},
   {10, 10, 10, 10, 11},    //U
   {10, 10, 10, 12, 10},    //V
   {10, 10, 10, 10, 10},    //W
@@ -404,13 +404,8 @@ int compareLetterHand (int letter, int reading[5]) {
     float expected    = (float) letterMatrix[letter][finger];
     float delta       = (float) abs(actual - expected);
 
-    int val = 0;
-    if (delta < tolerance) {
-      confidence += 20;
-    } else {
-      int val = (20/tolerance)*(tolerance - delta);
-      confidence += val; // Max confidence
-    }
+    int val = (20/tolerance)*(tolerance - delta);
+    confidence += val; // Max confidence
   }
   return (int) confidence;
 }
