@@ -10,9 +10,9 @@ const int UP_TILT_PIN = 3;
 int SAMPLES = 3;
 int FINGERS = 5;
 int LETTERS = 26;
-int MIN_ERROR_DELTA = 5; // Ensures some range of motion. Enforced when determining confidence. 
+int MIN_ERROR_DELTA = 5; // Must be >= 1. Ensures some range of motion. Enforced when determining confidence. 
 int TILT_CONFIDENCE = 25; // +/- amount that is added if BOTH tilt sensors are correct
-
+int MIN_CONFIDENCE = -100;
 
 // Measured voltage of arduino 5V
 const float VCC = 4.98; // Measured voltage of Ardunio 5V line
@@ -255,13 +255,13 @@ int getLetterConfidence (int letter, int data[5]) {
     float actual      = (float) data[finger];
     float expected    = (float) letterMatrix[letter][finger];
     float delta       = (float) abs(actual - expected);
-    float tolerance   = (float) error[letter][finger];
+    float tolerance   = (float) error[letter][finger]; 
     
     if (tolerance < MIN_ERROR_DELTA) { // Ensures a minimum error tolerance
         tolerance = MIN_ERROR_DELTA;
     }
       
-    int rating = (int) ((20.0/tolerance)*(tolerance - delta));
+    int rating = (int) ((100.0 / tolerance)*(tolerance - delta));
     confidence += rating; // Max confidence
   }
   return (int) confidence;
@@ -292,6 +292,11 @@ void determineLetter(int sensorReadings [5]) {
       bestLetter = letter;
       bestConfidence = letterConfidence;
     }
+  } //
+
+  // If not confident:
+  if (bestConfidence < MIN_CONFIDENCE) {
+    Serial.println("Less than minimum confidence");
   }
 
   // Convert to 0-100 scale
@@ -303,7 +308,7 @@ void determineLetter(int sensorReadings [5]) {
   }
   
   Serial.println("Display confidence: " + String(displayConfidence));
-  Serial.println(String(bestConfidence) + "% confident that the letter is " + String(getLetter(bestLetter)));
+  Serial.println(String(bestConfidence) + " rating that the letter is " + String(getLetter(bestLetter)));
   delay(500); // Repurpose
 }
 
@@ -332,7 +337,7 @@ void performCalibration() {
       for (int k = 0; k < FINGERS; k++) {
         finger_samples[k][j] = readFingerByIndex(k);
       }
-      Serial.println("Completed!");
+      Serial.println("Completed!"); 
       if(getCommands() == '-') {
         letter -=1;
         continue;
