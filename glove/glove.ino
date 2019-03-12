@@ -134,6 +134,13 @@ void setup() {
   Serial.begin(9600);
   pinMode(FLEX_PIN5, INPUT);
 
+  Serial.begin(9600);
+  pinMode(SIDE_TILT_PIN, INPUT);
+  digitalWrite(SIDE_TILT_PIN, LOW);
+  Serial.begin(9600);
+  pinMode(UP_TILT_PIN, INPUT);
+  digitalWrite(UP_TILT_PIN, LOW);
+
   // Greeting and determine mode. 
   Serial.println("Welcome to G.L.O.V.E ASL translator. Please select one of the following options:");
   Serial.print("Calibrate glove (c) or use default values (d): ");
@@ -201,18 +208,18 @@ void executeCommands(char command){
       break;
       
     case 't': // set tilt confidence values
-      TILT_CONFIDENCE = userInputInt(2); // 0-99 value
+      TILT_CONFIDENCE = userInputInt(1); // 0-99 value
       Serial.println("TILT_CONFIDENCE is " + String(TILT_CONFIDENCE));
 
       break;
       
     case 'm': // change minium error delta
-      MIN_ERROR_DELTA = userInputInt(2); // 0-99 value
+      MIN_ERROR_DELTA = userInputInt(1); // 0-99 value
       Serial.println("MIN_ERROR_DELTA is " + String(MIN_ERROR_DELTA));
       break;
 
     case 'a': // change amount of data samples
-      SAMPLES = userInputInt(2); // 0-99 value
+      SAMPLES = userInputInt(1); // 0-99 value
       Serial.println("SAMPLES is " + String(SAMPLES));
 
       break;
@@ -239,13 +246,10 @@ void executeCommands(char command){
 }
 
 int userInputInt(int digits) {
-  int n = 0;
-  for (int numbers = digits - 1; numbers >= 0; numbers--) {
-    while (!Serial.available()); // wait for user input
+  while (!Serial.available()); // wait for user input
+    delay(1000);
     int num = Serial.parseInt();
-    n += ((int) pow(10, numbers)) * num;
-  }
-  return n;
+  return num;
 }
 
 // Returns confidence rating for letter based on LetterMatrix and error values
@@ -276,6 +280,7 @@ void determineLetter(int sensorReadings [5]) {
   // Find best letter match
   int bestLetter = -1;
   int bestConfidence = -1;
+  
   for (int letter = 0; letter < LETTERS; letter++) {
     // Take into consideration tilt sensor readings
     int tiltSensor = -1;
