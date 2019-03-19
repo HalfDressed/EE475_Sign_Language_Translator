@@ -7,14 +7,13 @@ sound = False
 
 def on_press(key):
     try:
-        if key.char:
-        #    print('alphanumeric key {0} pressed'.format(key.char))
-            print('\nSENDING COMMAND {0}'.format(key.char))
-            key_byte = key.char.encode('utf-8')
-            arduino.write(key_byte)
+    #    print('alphanumeric key {0} pressed'.format(key.char))
+        print('SENDING COMMAND {0}'.format(key.char))
+        key_byte = key.char.encode('utf-8')
+        arduino.write(key_byte)
     except AttributeError:
-        pass
-        #print('special key {0} pressed'.format(key))
+        print('special key {0} pressed'.format(
+            key))
     
 # Collect events until released
 with keyboard.Listener(
@@ -23,21 +22,17 @@ with keyboard.Listener(
         data = arduino.readline()
         if data:
             line = data.decode('utf-8')
-            # Get rid of newline at the end
-            if line.endswith('\n'):
-                print(line[:-2])
-            else:
-                print(line)
+            print(line[:-2])
             if line.startswith('Calibrate glove'):
                 key = input('')
                 key_byte = key.encode('utf-8')
-                print('\nRecieved key ')
+                print('Recieved key ')
                 print(key)
                 arduino.write(key_byte)
             if line.startswith('Sound is'):
                 if 'OFF' in line: sound = False
                 else: sound = True
             # Index at -3 to get rid of newline character
-            if 'confident' in line and line[-3].isupper() and sound:
+            if 'rating' in line and line[-3].isupper() and sound:
                 letter = line[-3]
                 playsound('alphabet/%s.wav' % str(letter))
