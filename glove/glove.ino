@@ -10,7 +10,8 @@ const int UP_TILT_PIN = 3;
 int SAMPLES = 3;
 int FINGERS = 5;
 int LETTERS = 26;
-int MIN_ERROR_DELTA = 5; // Must be >= 1. Ensures some range of motion. Enforced when determining confidence. 
+int MIN_ERROR_DELTA = 5; // Must be >= 1. Ensures some range of motion. Enforced when determining confidence.
+int MAX_ERROR_DELTA = 20; 
 int TILT_CONFIDENCE = 25; // +/- amount that is added if BOTH tilt sensors are correct
 int MIN_CONFIDENCE = -100;
 
@@ -57,7 +58,6 @@ int letterMatrix[26][5] = {
   {53, 14, 99, 88, 101},     //Z
 };
 
-
 int error[26][5] = {
   {6, 7, 5, 5, 5},     //A
   {12, 5, 5, 5, 5},    //B
@@ -74,7 +74,7 @@ int error[26][5] = {
   {5, 10, 5, 5, 7},    //M
   {5, 8, 5, 5, 13},    //N
   {5, 5, 5, 5, 9},     //O
-  {5, 5, 5, 5, 7},     //P
+  {5, 5, 5, 9, 7},     //P
   {5, 5, 6, 6, 14},    //Q
   {10, 5, 5, 6, 5},    //R
   {5, 10, 5, 5, 5},    //S
@@ -99,7 +99,7 @@ boolean letterTilt[26][2] = {
   {HIGH, LOW}, //G
   {HIGH, LOW}, //H
   {LOW, HIGH}, //I
-  {LOW, HIGH}, //J TODO: not needed?
+  {LOW, HIGH}, //J
   {LOW, HIGH}, //K
   {LOW, HIGH}, //L
   {LOW, HIGH}, //M
@@ -115,7 +115,7 @@ boolean letterTilt[26][2] = {
   {LOW, HIGH}, //W
   {LOW, HIGH}, //X
   {LOW, HIGH}, //Y
-  {LOW, HIGH}, //Z TODO: not needed?
+  {LOW, HIGH}, //Z
 };
 
 
@@ -268,6 +268,7 @@ int getLetterConfidence (int letter, int data[5]) {
     int rating = (int) ((100.0 / tolerance)*(tolerance - delta));
     confidence += rating; // Max confidence
   }
+
   return (int) confidence;
 }
 
@@ -281,6 +282,11 @@ void determineLetter(int sensorReadings [5]) {
   int bestLetter = -1;
   int bestConfidence = -1;
   
+  Serial.print("SIDE TILT:");
+  Serial.println(handTiltSide);
+  Serial.print("UP TILT:");
+  Serial.println(handTiltUp);
+  
   for (int letter = 0; letter < LETTERS; letter++) {
     // Take into consideration tilt sensor readings
     int tiltSensor = -1;
@@ -292,7 +298,7 @@ void determineLetter(int sensorReadings [5]) {
 
     // Determine confidence for this letter and remember best
     int letterConfidence = getLetterConfidence(letter, sensorReadings) + tiltSensor;
-    Serial.println("\t confidence for " + String(getLetter(letter)) + " is " + String(letterConfidence));
+    //Serial.println("\t confidence for " + String(getLetter(letter)) + " is " + String(letterConfidence));
     if (letter == 0 || letterConfidence >= bestConfidence) {
       bestLetter = letter;
       bestConfidence = letterConfidence;
@@ -314,6 +320,16 @@ void determineLetter(int sensorReadings [5]) {
   
   Serial.println("Display confidence: " + String(displayConfidence));
   Serial.println(String(bestConfidence) + " rating that the letter is " + String(getLetter(bestLetter)));
+  Serial.println("Sensor readings:");
+  Serial.print("{");
+  for (int i = 0; i < 5; i++) {
+    Serial.print(String(sensorReadings[i]));
+    if (i != 4) {
+      Serial.print(", ");
+    }
+  }
+  Serial.println("}");
+  
   delay(500); // Repurpose
 }
 
